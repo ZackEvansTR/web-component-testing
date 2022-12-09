@@ -1,0 +1,97 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Accordion web component</title>
+  <meta name="description" content="Testing web components">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+  <h1>Accordion web component</h1>
+  <ze-accordion>
+    <div slot="contents">
+      <ze-accordion-item data-heading-level="3" data-id="1">
+        <div slot="toggle">
+          My toggle namestatic get observedAttributes() {
+  return ['name'];
+}
+        </div>
+        <div slot="panel">
+          My  custom panel content
+        </div>
+      </ze-accordion-item>
+    </div>
+  </ze-accordion>
+
+  <template id="ze-accordion-template">
+    <div class="accordion">
+      <slot name="contents">
+        <p>Accordion contents go here</p>
+      </slot>
+    </div>
+  </template>
+
+  <template id="ze-accordion-item-template">
+    <h2>
+      <button aria-controls="" aria-expanded="" id="">
+        <slot name="toggle">
+          Accordion heading goes here.
+        </slot>
+      </button>
+    </h2>
+    <div id="" role="region" aria-labelledby="">
+      <slot name="panel">
+        <p>Accordion panel content goes here.</p>
+      </slot>
+    </div>
+  </template>
+
+  <script>
+    customElements.define(
+      'ze-accordion',
+      class ZeAccordion extends HTMLElement {
+        constructor() {
+          super();
+
+          const {content: templateContent} = document.getElementById('ze-accordion-template');
+          
+          const shadowRoot = this.attachShadow({mode: 'closed'});
+          shadowRoot.append(templateContent.cloneNode(true));
+        }
+      }
+    );
+
+    customElements.define(
+      'ze-accordion-item',
+      class ZeAccordionItem extends HTMLElement {
+        constructor() {
+          super();
+        }
+
+        connectedCallback() {
+          const {headingLevel, id} = this.dataset;
+          const {content: templateContent} = document.getElementById('ze-accordion-item-template');
+          
+          const newHeading = document.createElement(`h${headingLevel}`);
+          const newButton = document.createElement('button');
+          newButton.id = `ze-accordion-heading-${id}`;
+          newButton.setAttribute('aria-expanded', false);
+          newButton.setAttribute('aria-controls', `ze-accordion-panel-${id}`);
+          newButton.textContent = 'Hi';
+          newHeading.appendChild(newButton);
+
+
+          templateContent.replaceChild(newHeading, templateContent.querySelector('h2'));
+
+          const shadowRoot = this.attachShadow({mode: 'closed'});
+          shadowRoot.append(templateContent.cloneNode(true));
+        }
+      }
+    );
+
+  </script>
+</body>
+
+</html>
